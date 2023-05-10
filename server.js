@@ -7,6 +7,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+//Routes
+app.use('/api/v1/', require('./routes/UserRoutes'));
+
 const PORT = process.env.PORT || 5000;
 
 // Connect DB
