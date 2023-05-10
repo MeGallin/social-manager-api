@@ -19,6 +19,7 @@ const UserSchema = new mongoose.Schema(
       type: String,
       required: [true, 'Password is required'],
       minlength: 8,
+      select: false,
     },
     isAdmin: {
       type: Boolean,
@@ -72,6 +73,11 @@ UserSchema.pre('save', async function (next) {
   this.password = await bcrypt.hash(this.password, salt);
   next();
 });
+
+//This is an instance method
+UserSchema.methods.correctPassword = async function (candidatePW, userPW) {
+  return await bcrypt.compare(candidatePW, userPW);
+};
 
 const User = mongoose.model('User', UserSchema);
 
