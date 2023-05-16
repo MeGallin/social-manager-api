@@ -26,9 +26,7 @@ exports.register = catchAsync(async (req, res, next) => {
   });
 
   //Future email confirmation
-
   const token = signInToken(newUser._id);
-
   res.status(201).json({
     success: true,
     token,
@@ -49,7 +47,6 @@ exports.login = catchAsync(async function (req, res, next) {
 
   // 2. check if user exists && password is correct
   const user = await User.findOne({ email }).select('+password');
-
   if (!user || !(await user.correctPassword(password, user.password)))
     return next(new ErrorResponse('Incorrect email or Password', 401));
 
