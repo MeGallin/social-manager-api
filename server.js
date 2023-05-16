@@ -12,8 +12,25 @@ app.use('/api/v1/', require('./routes/UserRoutes'));
 
 const PORT = process.env.PORT || 5000;
 
-// Connect DB
-connectDB().then(() => {
-  app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
-});
+// Connect to DB
+connectDB()
+  .then(() => {
+    const server = app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+    });
+
+    // Close server gracefully
+    process.on('SIGTERM', () => {
+      console.log('Closing server gracefully...');
+      server.close(() => {
+        console.log('Server closed.');
+        process.exit(0);
+      });
+    });
+  })
+  .catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
+
 module.exports = app;
