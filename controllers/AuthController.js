@@ -22,10 +22,12 @@ exports.register = catchAsync(async (req, res, next) => {
     photo: '/assets/images/sample.jpg',
   });
 
+  //This will log the user into the application
+  const token = signInToken(newUser._id);
   //Future email confirmation
   res.status(201).json({
     status: 'success',
-
+    token,
     data: {
       user: newUser,
     },
@@ -33,9 +35,9 @@ exports.register = catchAsync(async (req, res, next) => {
 });
 
 // @description: USER login
-// @route: POST /api/v1/login
+// @route: POST /api/v1/user/login
 // @access: Public
-exports.login = catchAsync(async function (req, res, next) {
+exports.login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
   // 1. check if email and PW exists
   if (!email || !password)
@@ -43,10 +45,11 @@ exports.login = catchAsync(async function (req, res, next) {
 
   // 2. check if user exists && password is correct
   const user = await User.findOne({ email }).select('+password');
+
   if (!user || !(await user.correctPassword(password, user.password)))
     return next(new ErrorResponse('Incorrect email or Password', 401));
 
   // 3. if all true then send token to client
   const token = signInToken(user._id);
-  res.status(200).json({ success: true, token });
+  res.status(200).json({ status: 'success', token });
 });
