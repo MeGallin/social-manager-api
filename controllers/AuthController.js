@@ -11,25 +11,21 @@ const signInToken = (id) => {
 };
 
 // @description: Register new user
-// @route: POST /api/v1/register
+// @route: POST /api/v1/user/register
 // @access: Public
 exports.register = catchAsync(async (req, res, next) => {
-  const ipAddress = requestIp.getClientIp(req);
   const { name, email, password } = req.body;
   const newUser = await User.create({
     name,
     email,
     password,
-    profileImage: '/assets/images/sample.jpg',
-    cloudinaryId: '12345',
-    ipAddress,
+    photo: '/assets/images/sample.jpg',
   });
 
   //Future email confirmation
-  const token = signInToken(newUser._id);
   res.status(201).json({
-    success: true,
-    token,
+    status: 'success',
+
     data: {
       user: newUser,
     },
