@@ -1,84 +1,30 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
+const validator = require('validator');
 
-const UserSchema = new mongoose.Schema(
+const userSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: [true, 'Name is required'],
+      required: [true, 'Please tell us your name'],
     },
     email: {
       type: String,
-      required: [true, 'Email is required'],
+      required: [true, 'Please provide an email address'],
       unique: true,
-      sparse: true,
       lowercase: true,
+      validate: [validator.isEmail, 'Please provide a valid email'],
     },
+    photo: String,
     password: {
       type: String,
-      required: [true, 'Password is required'],
+      required: [true, 'Please provide a password'],
       minlength: 8,
-      select: false,
     },
-    isAdmin: {
-      type: Boolean,
-      required: true,
-      default: false,
-    },
-    isConfirmed: {
-      type: Boolean,
-      required: true,
-      default: false,
-    },
-    isSuspended: {
-      type: Boolean,
-      required: true,
-      default: false,
-    },
-    profileImage: {
-      type: String,
-    },
-    cloudinaryId: {
-      type: String,
-    },
-    resetPasswordToken: {
-      type: String,
-    },
-    ipAddress: {
-      type: String,
-    },
-    loginCounter: {
-      type: Number,
-      default: 0,
-    },
-    registeredWithGoogle: {
-      type: Boolean,
-      required: true,
-      default: false,
-    },
-    resetPasswordToken: String,
-    resetPasswordExpire: Date,
   },
   {
     timestamps: true,
   },
 );
-
-// This the pre-save middleware
-UserSchema.pre('save', async function (next) {
-  //This will execute only if PW is modified
-  if (!this.isModified('password')) return next();
-  const salt = await bcrypt.genSalt(12);
-  this.password = await bcrypt.hash(this.password, salt);
-  next();
-});
-
-//This is an instance method
-UserSchema.methods.correctPassword = async function (candidatePW, userPW) {
-  return await bcrypt.compare(candidatePW, userPW);
-};
-
-const User = mongoose.model('User', UserSchema);
+const User = mongoose.model('User', userSchema);
 
 module.exports = User;
