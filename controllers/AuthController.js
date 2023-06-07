@@ -59,14 +59,32 @@ exports.protect = catchAsync(async (req, res, next) => {
   next();
 });
 
+//Restrict to various roles
+exports.restrictTo = (...roles) => {
+  return (req, res, next) => {
+    // roles ['admin', 'moderator']
+
+    if (!roles.includes(req.user.role)) {
+      return next(
+        new ErrorResponse(
+          'You do not have permission to perform this task',
+          403,
+        ),
+      );
+    }
+    next();
+  };
+};
+
 // @description: Register new user
 // @route: POST /api/v1/user/register
 // @access: Public
 exports.register = catchAsync(async (req, res, next) => {
-  const { name, email, password } = req.body;
+  const { name, email, role, password } = req.body;
   const newUser = await User.create({
     name,
     email,
+    role,
     password,
     photo: '/assets/images/sample.jpg',
   });
